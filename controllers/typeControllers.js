@@ -1,6 +1,7 @@
 const { Type } = require('../models/models')
 const ApiError = require('../error/apiError')
 
+
 class typeController {
     async create(req, res) {
         const { name } = req.body
