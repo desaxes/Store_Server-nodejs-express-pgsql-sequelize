@@ -5,11 +5,11 @@ const uuid = require('uuid')
 class deviceController {
     async addDevice(req, res, next) {
         try {
-            const { name, price, brandId, typeId, info } = req.body
-            const { img } = req.files
+            let { name, price, brandId, typeId, info } = req.body
+            let { img } = req.files
             let fileName = uuid.v4() + ".jpg"
             img.mv(path.resolve(__dirname, '..', 'static', fileName))
-            const device = await Device.create({
+            let device = await Device.create({
                 name, price, brandId, typeId, img: fileName
             })
             if (info) {
@@ -33,12 +33,13 @@ class deviceController {
         page = page || 1
         limit = limit || 3
         let offset = page * limit - limit
+        let splitBrands = brandId.split(',')
         // if (brandId && typeId) {
         //     devices = await Device.findAndCountAll({where:{typeId,brandId},limit,offset})
         // }
         let devices = await Device.findAll()
         if (brandId) {
-            devices = devices.filter(e => e.brandId === parseInt(brandId))
+            devices = devices.filter(e => splitBrands.some(b => +b === e.brandId))
         }
         if (typeId) {
             devices = devices.filter(e => e.typeId === parseInt(typeId))
@@ -47,21 +48,22 @@ class deviceController {
             devices = devices.filter(e => e.name.toLowerCase().indexOf(
                 (name).toLowerCase()) > -1)
         }
-        if (devices.slice(offset, offset + limit).length > 0) {
-            res.json(devices.slice(offset, offset + limit))
-        }
-        else {
-            res.json(devices.slice(0, limit))
-        }
+        // if (devices.slice(offset, offset + limit).length > 0) 
+        // {
+        res.json({ devices: devices.slice(offset, offset + +limit), total: devices.length })
+        // }
+        // else {
+        //     res.json(devices.slice(0, limit))
+        // }
     }
     async getDeviceById(req, res) {
         const { id } = req.params
-        const device = await Device.findAll({
+        const device = await Device.findOne({
             where: {
                 id: id
             },
-            include:[{
-                model:DeviceInfo, as: "info"
+            include: [{
+                model: DeviceInfo, as: "info"
             }]
         })
         res.json(device)
