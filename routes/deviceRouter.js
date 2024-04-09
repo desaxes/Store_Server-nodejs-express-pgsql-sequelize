@@ -4,6 +4,7 @@ const deviceController = require('../controllers/deviceControllers')
 const checkRoleMiddleware = require('../middlewares/checkRoleMiddleware')
 
 router.post('/', checkRoleMiddleware("ADMIN"), deviceController.addDevice)
+router.post('/to', deviceController.addDeviceToBasket)
 router.get('/', deviceController.getAllDevice)
 router.get('/:id', deviceController.getDeviceById)
 

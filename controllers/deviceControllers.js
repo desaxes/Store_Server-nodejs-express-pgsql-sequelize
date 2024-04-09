@@ -1,4 +1,4 @@
-const { Device, DeviceInfo } = require('../models/models')
+const { Device, DeviceInfo, BasketDevice } = require('../models/models')
 const ApiError = require('../error/apiError')
 const path = require('path')
 const uuid = require('uuid')
@@ -34,9 +34,6 @@ class deviceController {
         limit = limit || 3
         let offset = page * limit - limit
         let splitBrands = brandId.split(',')
-        // if (brandId && typeId) {
-        //     devices = await Device.findAndCountAll({where:{typeId,brandId},limit,offset})
-        // }
         let devices = await Device.findAll()
         if (brandId) {
             devices = devices.filter(e => splitBrands.some(b => +b === e.brandId))
@@ -48,13 +45,7 @@ class deviceController {
             devices = devices.filter(e => e.name.toLowerCase().indexOf(
                 (name).toLowerCase()) > -1)
         }
-        // if (devices.slice(offset, offset + limit).length > 0) 
-        // {
         res.json({ devices: devices.slice(offset, offset + +limit), total: devices.length })
-        // }
-        // else {
-        //     res.json(devices.slice(0, limit))
-        // }
     }
     async getDeviceById(req, res) {
         const { id } = req.params
@@ -66,6 +57,11 @@ class deviceController {
                 model: DeviceInfo, as: "info"
             }]
         })
+        res.json(device)
+    }
+    async addDeviceToBasket(req, res) {
+        const { basketId, deviceId } = req.body
+        const device = await BasketDevice.create({ basketId, deviceId })
         res.json(device)
     }
 }
