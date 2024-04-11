@@ -1,4 +1,4 @@
-const { Device, DeviceInfo, BasketDevice } = require('../models/models')
+const { Device, DeviceInfo } = require('../models/models')
 const ApiError = require('../error/apiError')
 const path = require('path')
 const uuid = require('uuid')
@@ -57,11 +57,6 @@ class deviceController {
                 model: DeviceInfo, as: "info"
             }]
         })
-        res.json(device)
-    }
-    async addDeviceToBasket(req, res) {
-        const { basketId, deviceId } = req.body
-        const device = await BasketDevice.create({ basketId, deviceId })
         res.json(device)
     }
 }
